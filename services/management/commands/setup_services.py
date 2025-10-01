@@ -39,7 +39,9 @@ class Command(BaseCommand):
                 defaults=service_data
             )
 
-            if created or service.api_key != api_key:
+            decrypted_key = service.get_api_key() if not created else None
+
+            if created or decrypted_key != api_key:
                 service.set_api_key(api_key)
                 service.save()
                 action = "Created" if created else "Updated"

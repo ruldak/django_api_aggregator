@@ -16,7 +16,7 @@ class UnifiedWeatherView(APIView):
             'openweather',
             '/weather',
             params={'q': f"{city},{country}", 'units': 'metric'},
-            user=request.user if request.user.is_authenticated else None
+            user=request.user
         )
 
         return Response(results)
@@ -33,7 +33,7 @@ class UnifiedNewsView(APIView):
             'newsapi',
             '/v2/top-headlines',
             params={'category': category, 'pageSize': 10},
-            user=request.user if request.user.is_authenticated else None
+            user=request.user
         )
 
         return Response(results)
@@ -52,7 +52,7 @@ class GitHubUserInfoView(APIView):
         results = client.make_request(
             'github',
             f'/users/{username}',
-            user=request.user if request.user.is_authenticated else None
+            user=request.user
         )
 
         return Response(results)

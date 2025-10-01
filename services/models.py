@@ -21,6 +21,11 @@ class ThirdPartyService(models.Model):
 
     def save(self, *args, **kwargs):
         """Pastikan API key selalu diencrypt sebelum save"""
+        # Check if the api_key is already encrypted
+        try:
+            encryption_service.decrypt(self.api_key)
+        except Exception:
+            self.set_api_key(self.api_key)
         super().save(*args, **kwargs)
 
 class APIRequestLog(models.Model):

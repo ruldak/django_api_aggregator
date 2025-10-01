@@ -19,13 +19,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&5(ktg#**$s!6eh98p%=^e_so00a%nvhh%9navri8_3&d(q4yn'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-&5(ktg#**$s!6eh98p%=^e_so00a%nvhh%9navri8_3&d(q4yn')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -97,10 +102,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'api_aggregator',
-        'USER': 'hary',
-        'PASSWORD': '123',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'USER': os.getenv('DB_USER', 'hary'),
+        'PASSWORD': os.getenv('DB_PASSWORD', '123'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '3306'),
     }
 }
 

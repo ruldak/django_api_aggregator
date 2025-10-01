@@ -60,7 +60,6 @@ class APIClient:
             elif service_name == 'github':
                 if decrypted_api_key and decrypted_api_key != 'YOUR_GITHUB_TOKEN':
                     headers['Authorization'] = f'token {decrypted_api_key}'
-                    print(f"github pat: {decrypted_api_key}")
 
             response = self._make_request_with_retry(
                 service.api_endpoint + endpoint,
@@ -142,13 +141,13 @@ class APIClient:
             'service': 'openweather',
             'location': data.get('name', 'Unknown'),
             'country': data.get('sys', {}).get('country', ''),
-            'temperature': data['main']['temp'],
-            'feels_like': data['main']['feels_like'],
-            'description': data['weather'][0]['description'],
-            'humidity': data['main']['humidity'],
-            'pressure': data['main']['pressure'],
-            'wind_speed': data['wind']['speed'],
-            'wind_direction': data['wind'].get('deg', 0),
+            'temperature': data.get('main', {}).get('temp'),
+            'feels_like': data.get('main', {}).get('feels_like'),
+            'description': data.get('weather', [{}])[0].get('description'),
+            'humidity': data.get('main', {}).get('humidity'),
+            'pressure': data.get('main', {}).get('pressure'),
+            'wind_speed': data.get('wind', {}).get('speed'),
+            'wind_direction': data.get('wind', {}).get('deg', 0),
             'visibility': data.get('visibility', 0),
             'timestamp': datetime.now().isoformat()
         }
