@@ -1,11 +1,11 @@
 from .utils.api_client import APIClient
-from .permissions import HasUserAPIKey, IsAPIKeyOwner
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .permissions import HasAPIKey
 from rest_framework.permissions import IsAuthenticated
 
 class UnifiedWeatherView(APIView):
-    permission_classes = [HasUserAPIKey, IsAPIKeyOwner]
+    permission_classes = [HasAPIKey]
 
     def get(self, request, format=None):
         city = request.GET.get('city', 'London')
@@ -23,7 +23,7 @@ class UnifiedWeatherView(APIView):
 
 
 class UnifiedNewsView(APIView):
-    permission_classes = [HasUserAPIKey, IsAPIKeyOwner]
+    permission_classes = [HasAPIKey]
 
     def get(self, request, format=None):
         category = request.GET.get('category', 'general')
@@ -40,7 +40,7 @@ class UnifiedNewsView(APIView):
 
 
 class GitHubUserInfoView(APIView):
-    permission_classes = [HasUserAPIKey, IsAPIKeyOwner]
+    permission_classes = [HasAPIKey]
 
     def get(self, request, format=None):
         username = request.GET.get('username')

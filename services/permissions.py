@@ -1,32 +1,28 @@
-from rest_framework import permissions
 from rest_framework_api_key.permissions import BaseHasAPIKey
 from user.models import UserAPIKey
 
-class HasUserAPIKey(BaseHasAPIKey):
+class HasAPIKey(BaseHasAPIKey):
     model = UserAPIKey
 
-class IsAPIKeyOwner(permissions.BasePermission):
-    """Permission untuk memastikan API key milik user yang sesuai"""
-
     def has_permission(self, request, view):
-        # Dapatkan API key dari header
-        key = request.META.get("HTTP_AUTHORIZATION", "").split()
-        if not key or key[0] != "Api-Key":
+        has_key = super().has_permission(request, view)
+
+        if not has_key:
+            return False
+
+        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+
+        if not auth_header.startswith("Api-Key "):
             return False
 
         try:
-            api_key = key[1]  # Extract key-nya
-            user_api_key = UserAPIKey.objects.get_from_key(api_key)
+            key = self.get_key(request)
+            print(f"key: {key}")
+            user_api_key = UserAPIKey.objects.get_from_key(key)
 
-            # Validasi tambahan
             if user_api_key.revoked:
                 return False
 
-            if not user_api_key.user.is_active:
-                return False
-
-            # SET USER di request - INI YANG PENTING!
-            request.user = user_api_key.user
             return True
-        except UserAPIKey.DoesNotExist:
+        except (UserAPIKey.DoesNotExist, IndexError):
             return False
