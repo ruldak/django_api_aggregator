@@ -39,10 +39,6 @@ class Command(BaseCommand):
                 defaults=service_data
             )
 
-            print(f'github key: {os.getenv("GITHUB_PERSONAL_TOKEN")}')
-            print(f'newsapi key: {os.getenv("NEWSAPI_API_KEY")}')
-            print(f'openweather key: {os.getenv("OPENWEATHER_API_KEY")}')
-
             if created or service.api_key != api_key:
                 service.set_api_key(api_key)
                 service.save()
