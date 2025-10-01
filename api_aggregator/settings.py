@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'user',
     'rest_framework',
     'rest_framework_simplejwt',
-     "rest_framework_api_key",
+    "rest_framework_api_key",
 ]
 
 REST_FRAMEWORK = {
@@ -50,7 +50,7 @@ REST_FRAMEWORK = {
     ),
      "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework_api_key.permissions.HasAPIKey",
-    ]
+    ],
 }
 
 from datetime import timedelta
