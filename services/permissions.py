@@ -15,7 +15,7 @@ class IsAPIKeyOwner(permissions.BasePermission):
             return False
 
         try:
-            api_key = auth_header.split()[1]  # Extract key-nya
+            api_key = key[1]  # Extract key-nya
             user_api_key = UserAPIKey.objects.get_from_key(api_key)
 
             # Validasi tambahan
