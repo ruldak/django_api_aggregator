@@ -14,12 +14,6 @@ class CreateUserAPIKey(APIView):
     def post(self, request):
         user = request.user
 
-        # Cek apakah user sudah punya API key
-        if hasattr(user, 'api_key'):
-            return Response({
-                'error': 'User already has an API key'
-            }, status=status.HTTP_400_BAD_REQUEST)
-
         # Buat API key baru
         api_key, key = UserAPIKey.objects.create_key(
             name=f"{user.username}_key",
