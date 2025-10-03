@@ -51,12 +51,15 @@ class APIClient:
                 'Accept': 'application/json'
             }
 
-            # Different auth strategies untuk different services
+            params = params or {}
+            print(f"params: {params}")
+
             if service_name == 'openweather':
-                params = params or {}
                 params['appid'] = decrypted_api_key
             elif service_name == 'newsapi':
                 headers['X-Api-Key'] = decrypted_api_key
+            elif service_name == 'coingecko':
+                params['x_cg_demo_api_key'] = decrypted_api_key
             elif service_name == 'github':
                 if decrypted_api_key and decrypted_api_key != 'YOUR_GITHUB_TOKEN':
                     headers['Authorization'] = f'token {decrypted_api_key}'
@@ -71,16 +74,16 @@ class APIClient:
             response_time_ms = int((time.time() - start_time) * 1000)
 
             # Transform response berdasarkan service
-            transformed_data = self._transform_response(service_name, response.json())
+            # transformed_data = self._transform_response(service_name, response.json())
 
             # Cache dengan timeout yang appropriate
             cache_timeout = self._get_cache_timeout(service_name)
-            file_cache.set(cache_key, transformed_data, cache_timeout)
+            file_cache.set(cache_key, response, cache_timeout)
 
             # Log successful request
             self._log_request(service_name, endpoint, response.status_code, response_time_ms, user)
 
-            return transformed_data
+            return response.json()
 
         except requests.Timeout:
             response_time_ms = int((time.time() - start_time) * 1000)
@@ -98,7 +101,8 @@ class APIClient:
         timeouts = {
             'openweather': 600,     # 10 menit untuk weather
             'newsapi': 300,         # 5 menit untuk news
-            'github': 1800,         # 30 menit untuk user data
+            'github': 1800,
+            'coingecko': 1800,
         }
         return timeouts.get(service_name, 300)  # Default 5 menit
 
@@ -118,6 +122,7 @@ class APIClient:
                     continue
 
                 response.raise_for_status()
+                print(f"raise for status: {response.raise_for_status()}")
                 return response
 
             except requests.RequestException as e:
@@ -126,66 +131,66 @@ class APIClient:
                 wait_time = (2 ** attempt) + 1
                 time.sleep(wait_time)
 
-    def _transform_response(self, service_name, data):
-        transformers = {
-            'openweather': self._transform_weather,
-            'newsapi': self._transform_news,
-            'github': self._transform_github,
-        }
-
-        transformer = transformers.get(service_name, lambda x: x)
-        return transformer(data)
-
-    def _transform_weather(self, data):
-        return {
-            'service': 'openweather',
-            'location': data.get('name', 'Unknown'),
-            'country': data.get('sys', {}).get('country', ''),
-            'temperature': data.get('main', {}).get('temp'),
-            'feels_like': data.get('main', {}).get('feels_like'),
-            'description': data.get('weather', [{}])[0].get('description'),
-            'humidity': data.get('main', {}).get('humidity'),
-            'pressure': data.get('main', {}).get('pressure'),
-            'wind_speed': data.get('wind', {}).get('speed'),
-            'wind_direction': data.get('wind', {}).get('deg', 0),
-            'visibility': data.get('visibility', 0),
-            'timestamp': datetime.now().isoformat()
-        }
-
-    def _transform_news(self, data):
-        return {
-            'service': 'newsapi',
-            'total_results': data.get('totalResults', 0),
-            'articles': [
-                {
-                    'title': article['title'],
-                    'description': article.get('description', ''),
-                    'url': article['url'],
-                    'image_url': article.get('urlToImage', ''),
-                    'source': article['source']['name'],
-                    'published_at': article['publishedAt'],
-                    'content': article.get('content', '')[:200] + '...' if article.get('content') else ''
-                }
-                for article in data.get('articles', [])[:8]  # Limit articles
-            ]
-        }
-
-    def _transform_github(self, data):
-        return {
-            'service': 'github',
-            'username': data['login'],
-            'name': data.get('name', ''),
-            'avatar_url': data['avatar_url'],
-            'followers': data['followers'],
-            'following': data['following'],
-            'public_repos': data['public_repos'],
-            'public_gists': data['public_gists'],
-            'location': data.get('location', ''),
-            'company': data.get('company', ''),
-            'blog': data.get('blog', ''),
-            'created_at': data['created_at'],
-            'updated_at': data['updated_at']
-        }
+    # def _transform_response(self, service_name, data):
+    #     transformers = {
+    #         'openweather': self._transform_weather,
+    #         'newsapi': self._transform_news,
+    #         'github': self._transform_github,
+    #     }
+    #
+    #     transformer = transformers.get(service_name, lambda x: x)
+    #     return transformer(data)
+    #
+    # def _transform_weather(self, data):
+    #     return {
+    #         'service': 'openweather',
+    #         'location': data.get('name', 'Unknown'),
+    #         'country': data.get('sys', {}).get('country', ''),
+    #         'temperature': data.get('main', {}).get('temp'),
+    #         'feels_like': data.get('main', {}).get('feels_like'),
+    #         'description': data.get('weather', [{}])[0].get('description'),
+    #         'humidity': data.get('main', {}).get('humidity'),
+    #         'pressure': data.get('main', {}).get('pressure'),
+    #         'wind_speed': data.get('wind', {}).get('speed'),
+    #         'wind_direction': data.get('wind', {}).get('deg', 0),
+    #         'visibility': data.get('visibility', 0),
+    #         'timestamp': datetime.now().isoformat()
+    #     }
+    #
+    # def _transform_news(self, data):
+    #     return {
+    #         'service': 'newsapi',
+    #         'total_results': data.get('totalResults', 0),
+    #         'articles': [
+    #             {
+    #                 'title': article['title'],
+    #                 'description': article.get('description', ''),
+    #                 'url': article['url'],
+    #                 'image_url': article.get('urlToImage', ''),
+    #                 'source': article['source']['name'],
+    #                 'published_at': article['publishedAt'],
+    #                 'content': article.get('content', '')[:200] + '...' if article.get('content') else ''
+    #             }
+    #             for article in data.get('articles', [])[:8]  # Limit articles
+    #         ]
+    #     }
+    #
+    # def _transform_github(self, data):
+    #     return {
+    #         'service': 'github',
+    #         'username': data['login'],
+    #         'name': data.get('name', ''),
+    #         'avatar_url': data['avatar_url'],
+    #         'followers': data['followers'],
+    #         'following': data['following'],
+    #         'public_repos': data['public_repos'],
+    #         'public_gists': data['public_gists'],
+    #         'location': data.get('location', ''),
+    #         'company': data.get('company', ''),
+    #         'blog': data.get('blog', ''),
+    #         'created_at': data['created_at'],
+    #         'updated_at': data['updated_at']
+    #     }
 
     def _log_request(self, service_name, endpoint, status_code, response_time, user, cached=False):
         try:

@@ -28,6 +28,12 @@ class Command(BaseCommand):
                 'api_endpoint': 'https://api.github.com',
                 'api_key': os.getenv("GITHUB_PERSONAL_TOKEN"),
                 'rate_limit_per_hour': 60
+            },
+            {
+                'name': 'coingecko',
+                'api_endpoint': 'https://api.coingecko.com/api/v3',
+                'api_key': os.getenv("COINGECKO_API_KEY"),
+                'rate_limit_per_hour': 60
             }
         ]
 
