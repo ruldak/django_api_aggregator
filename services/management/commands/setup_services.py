@@ -34,6 +34,12 @@ class Command(BaseCommand):
                 'api_endpoint': 'https://api.coingecko.com/api/v3',
                 'api_key': os.getenv("COINGECKO_API_KEY"),
                 'rate_limit_per_hour': 60
+            },
+            {
+                'name': 'exchangeRate',
+                'api_endpoint': 'https://v6.exchangerate-api.com/v6',
+                'api_key': os.getenv("EXCHANGE-RATE-API-KEY"),
+                'rate_limit_per_hour': 60
             }
         ]
 

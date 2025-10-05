@@ -60,10 +60,13 @@ class APIClient:
                 headers['X-Api-Key'] = decrypted_api_key
             elif service_name == 'coingecko':
                 params['x_cg_demo_api_key'] = decrypted_api_key
+            elif service_name == 'exchangeRate':
+                endpoint = f"/{decrypted_api_key}{endpoint}"
             elif service_name == 'github':
                 if decrypted_api_key and decrypted_api_key != 'YOUR_GITHUB_TOKEN':
                     headers['Authorization'] = f'token {decrypted_api_key}'
 
+            print(f"endpoint exchangeRate: {endpoint}")
             response = self._make_request_with_retry(
                 service.api_endpoint + endpoint,
                 params=params,

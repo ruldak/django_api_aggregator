@@ -228,3 +228,17 @@ class CGExchangesDetailView(APIView):
         )
 
         return Response(results)
+
+
+class ExchangesRateView(APIView):
+    permission_classes = [HasAPIKey]
+
+    def get(self, request, format=None):
+        client = APIClient()
+        results = client.make_request(
+            'exchangeRate',
+            '/latest/USD',
+            user=request.user
+        )
+
+        return Response(results)

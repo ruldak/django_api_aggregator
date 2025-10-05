@@ -9,6 +9,7 @@ from services.views import (
     CGCoinMarketChartView,
     CGHistoryCoinView,
     CGSearchTrendingView,
+    ExchangesRateView,
 )
 from user.views import RegisterView, CreateUserAPIKey
 from rest_framework_simplejwt.views import (
@@ -27,6 +28,7 @@ urlpatterns = [
     path('api/coins/history/', CGHistoryCoinView.as_view(), name='coins-history'),
     path('api/search/', CGSearchView.as_view(), name='search'),
     path('api/search/trending/', CGSearchTrendingView.as_view(), name='search-trending'),
+    path('api/exchanges/', ExchangesRateView.as_view(), name='exchanges-rate'),
 
     path("api/register/", RegisterView.as_view(), name="register_user"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
