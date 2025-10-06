@@ -4,10 +4,13 @@ from rest_framework.response import Response
 from .permissions import HasAPIKey
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime
+from django.utils.decorators import method_decorator
+from ratelimit.decorators import ratelimit
 
 class UnifiedWeatherView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         city = request.GET.get('city', 'London')
         country = request.GET.get('country', 'UK')
@@ -26,6 +29,7 @@ class UnifiedWeatherView(APIView):
 class UnifiedNewsView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         category = request.GET.get('category', 'general')
 
@@ -43,6 +47,7 @@ class UnifiedNewsView(APIView):
 class GitHubUserInfoView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         username = request.GET.get('username')
 
@@ -62,6 +67,7 @@ class GitHubUserInfoView(APIView):
 class CGSimplePriceView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         crypto_ids = request.GET.get('ids')
         vs_currencies = request.GET.get('vs_currencies')
@@ -91,6 +97,7 @@ class CGSimplePriceView(APIView):
 class CGCoinDetailView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         crypto_id = request.GET.get('id')
 
@@ -110,6 +117,7 @@ class CGCoinDetailView(APIView):
 class CGCoinMarketChartView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         vs_currency = request.GET.get('vs_currency')
         days = request.GET.get('days')
@@ -132,6 +140,7 @@ class CGCoinMarketChartView(APIView):
 class CGHistoryCoinView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         date = request.GET.get('date')
 
@@ -162,6 +171,7 @@ class CGHistoryCoinView(APIView):
 class CGSearchView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         query = request.GET.get('query')
 
@@ -182,6 +192,7 @@ class CGSearchView(APIView):
 class CGSearchTrendingView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         client = APIClient()
         results = client.make_request(
@@ -196,6 +207,7 @@ class CGSearchTrendingView(APIView):
 class CGExchangesView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         client = APIClient()
         results = client.make_request(
@@ -210,6 +222,7 @@ class CGExchangesView(APIView):
 class CGExchangesDetailView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         exchangesId = request.GET.get('id')
 
@@ -229,6 +242,7 @@ class CGExchangesDetailView(APIView):
 class ExchangesRateView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         currency = request.GET.get("currency")
 
@@ -248,6 +262,7 @@ class ExchangesRateView(APIView):
 class ConvertCurrencyView(APIView):
     permission_classes = [HasAPIKey]
 
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='GET', block=True))
     def get(self, request, format=None):
         fromCurrency = request.GET.get("from")
         to = request.GET.get("to")
