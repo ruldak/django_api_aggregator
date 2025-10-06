@@ -5,7 +5,7 @@ from .permissions import HasAPIKey
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime
 from django.utils.decorators import method_decorator
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 
 class UnifiedWeatherView(APIView):
     permission_classes = [HasAPIKey]
