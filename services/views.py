@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .permissions import HasAPIKey
 from rest_framework.permissions import IsAuthenticated
+from datetime import datetime
 
 class UnifiedWeatherView(APIView):
     permission_classes = [HasAPIKey]
@@ -62,13 +63,13 @@ class CGSimplePriceView(APIView):
     permission_classes = [HasAPIKey]
 
     def get(self, request, format=None):
-        ids = request.GET.get('ids')
+        crypto_ids = request.GET.get('ids')
         vs_currencies = request.GET.get('vs_currencies')
 
         missing = False
-        if not ids and not vs_currencies:
+        if not crypto_ids and not vs_currencies:
             missing = "ids and vs_currencies"
-        elif not ids:
+        elif not crypto_ids:
             missing = "ids"
         elif not vs_currencies:
             missing = "vs_currencies"
@@ -80,7 +81,7 @@ class CGSimplePriceView(APIView):
         results = client.make_request(
             'coingecko',
             '/simple/price',
-            params={'ids': ids, 'vs_currencies': vs_currencies},
+            params={'ids': crypto_ids, 'vs_currencies': vs_currencies},
             user=request.user
         )
 
@@ -91,15 +92,15 @@ class CGCoinDetailView(APIView):
     permission_classes = [HasAPIKey]
 
     def get(self, request, format=None):
-        coinId = request.GET.get('id')
+        crypto_id = request.GET.get('id')
 
-        if not coinId:
+        if not crypto_id:
             return Response({'error': 'id parameter required'}, status=400)
 
         client = APIClient()
         results = client.make_request(
             'coingecko',
-            f'/coins/{coinId}',
+            f'/coins/{crypto_id}',
             user=request.user
         )
 
@@ -112,25 +113,15 @@ class CGCoinMarketChartView(APIView):
     def get(self, request, format=None):
         vs_currency = request.GET.get('vs_currency')
         days = request.GET.get('days')
-        id = request.GET.get('id')
+        crypto_id = request.GET.get('id')
 
-        missing = False
-        if not days and not vs_currency and not id:
-            missing = "days, vs_currency and id"
-        elif not days:
-            missing = "days"
-        elif not vs_currency:
-            missing = "vs_currency"
-        elif not id:
-            missing = "id"
-
-        if missing:
-            return Response({'error': f'{missing} parameter required'}, status=400)
+        if not vs_currency or not days or not crypto_id:
+            return Response({'error': 'parameters vs_currency, days and id required'}, status=400)
 
         client = APIClient()
         results = client.make_request(
             'coingecko',
-            f'/coins/{id}/market_chart',
+            f'/coins/{crypto_id}/market_chart',
             params={"vs_currency": vs_currency, "days": days},
             user=request.user
         )
@@ -144,12 +135,17 @@ class CGHistoryCoinView(APIView):
     def get(self, request, format=None):
         date = request.GET.get('date')
 
+        try:
+            datetime.strptime(date, "%d-%m-%Y")
+        except ValueError:
+            return Response({'error': 'Invalid date format. Expected dd-mm-yyyy'}, status=400)
+
         if not date:
             return Response({'error': 'date parameter required'}, status=400)
 
-        coinId = request.GET.get('id')
+        crypto_id = request.GET.get('id')
 
-        if not coinId:
+        if not crypto_id:
             return Response({'error': 'id parameter required'}, status=400)
 
         client = APIClient()
@@ -234,10 +230,43 @@ class ExchangesRateView(APIView):
     permission_classes = [HasAPIKey]
 
     def get(self, request, format=None):
+        currency = request.GET.get("currency")
+
+        if not currency:
+            return Response({'error': 'currency parameter required'}, status=400)
+
         client = APIClient()
         results = client.make_request(
             'exchangeRate',
-            '/latest/USD',
+            f'/latest/{currency}',
+            user=request.user
+        )
+
+        return Response(results)
+
+
+class ConvertCurrencyView(APIView):
+    permission_classes = [HasAPIKey]
+
+    def get(self, request, format=None):
+        fromCurrency = request.GET.get("from")
+        to = request.GET.get("to")
+        amount = request.GET.get("amount")
+
+        if not amount:
+            amount = ""
+        elif not amount.isdigit():
+            return Response({'error': 'The parameter \'amount\' must be a number.'}, status=400)
+        else:
+            pass
+
+        if not fromCurrency or not to:
+            return Response({'error': 'parameters from and to is required'}, status=400)
+
+        client = APIClient()
+        results = client.make_request(
+            'exchangeRate',
+            f'/pair/{fromCurrency}/{to}/{amount}',
             user=request.user
         )
 
