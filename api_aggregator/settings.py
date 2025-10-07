@@ -109,6 +109,15 @@ DATABASES = {
     }
 }
 
+import sys
+
+# Gunakan database SQLite in-memory untuk pengujian
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+
 import os
 
 CACHES = {
