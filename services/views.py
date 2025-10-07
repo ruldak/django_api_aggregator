@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .permissions import HasAPIKey
 from rest_framework.permissions import IsAuthenticated
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 
@@ -145,7 +145,7 @@ class CGHistoryCoinView(APIView):
         date = request.GET.get('date')
 
         try:
-            datetime.strptime(date, "%d-%m-%Y")
+            input_date = datetime.strptime(date, "%d-%m-%Y")
         except ValueError:
             return Response({'error': 'Invalid date format. Expected dd-mm-yyyy'}, status=400)
 
@@ -157,10 +157,17 @@ class CGHistoryCoinView(APIView):
         if not crypto_id:
             return Response({'error': 'id parameter required'}, status=400)
 
+        today = datetime.today().date()
+
+        difference = today - input_date.date()
+
+        if difference.days > 365:
+            return Response({'error': 'Your request exceeds the allowed time range. Public API users are limited to querying historical data within the past 365 days.'}, status=400)
+
         client = APIClient()
         results = client.make_request(
             'coingecko',
-            f'/coins/{coinId}/history',
+            f'/coins/{crypto_id}/history',
             params={"date": date},
             user=request.user
         )

@@ -97,6 +97,8 @@ class APIClient:
             response_time_ms = int((time.time() - start_time) * 1000)
             self._log_request(service_name, endpoint, 500, response_time_ms, user)
             logger.error(f"API request failed untuk {service_name}: {str(e)}")
+            if 'url' in str(e):
+                return {"error": f"API request failed: Client Error"}
             return {"error": f"API request failed: {str(e)}"}
 
     def _get_cache_timeout(self, service_name):
