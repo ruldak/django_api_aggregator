@@ -45,7 +45,6 @@ API Aggregator is a service that brings together multiple APIs from different pr
     GITHUB_API_KEY=your_key
     COINGECKO_API_KEY=your_key
     EXCHANGERATE_API_KEY=your_key
-    ENCRYPTION_KEY=your_encryption_key # Create a strong random key
     ```
 
 5.  **Run database migrations:**
