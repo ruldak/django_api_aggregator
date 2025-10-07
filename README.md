@@ -14,8 +14,8 @@ API Aggregator is a service that brings together multiple APIs from different pr
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/username/api-aggregator.git
-    cd api-aggregator
+    git clone https://github.com/ruldak/django_api_aggregator.git
+    cd django_api_aggregator
     ```
 
 2.  **Create and activate a virtual environment:**
@@ -42,7 +42,7 @@ API Aggregator is a service that brings together multiple APIs from different pr
     DEBUG=True
     OPENWEATHER_API_KEY=your_key
     NEWSAPI_API_KEY=your_key
-    GITHUB_API_KEY=your_key # Optional
+    GITHUB_API_KEY=your_key
     COINGECKO_API_KEY=your_key
     EXCHANGERATE_API_KEY=your_key
     ENCRYPTION_KEY=your_encryption_key # Create a strong random key
