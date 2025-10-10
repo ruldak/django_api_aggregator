@@ -52,7 +52,6 @@ class APIClient:
             }
 
             params = params or {}
-            print(f"params: {params}")
 
             if service_name == 'openweather':
                 params['appid'] = decrypted_api_key
@@ -66,7 +65,6 @@ class APIClient:
                 if decrypted_api_key and decrypted_api_key != 'YOUR_GITHUB_TOKEN':
                     headers['Authorization'] = f'token {decrypted_api_key}'
 
-            print(f"endpoint exchangeRate: {endpoint}")
             response = self._make_request_with_retry(
                 service.api_endpoint + endpoint,
                 params=params,
@@ -104,12 +102,12 @@ class APIClient:
     def _get_cache_timeout(self, service_name):
         """Return cache timeout berdasarkan jenis service"""
         timeouts = {
-            'openweather': 600,     # 10 menit untuk weather
-            'newsapi': 300,         # 5 menit untuk news
+            'openweather': 600,
+            'newsapi': 300,
             'github': 1800,
             'coingecko': 1800,
         }
-        return timeouts.get(service_name, 300)  # Default 5 menit
+        return timeouts.get(service_name, 300)
 
     def _make_request_with_retry(self, url, params=None, headers=None, timeout=15, max_retries=3):
         for attempt in range(max_retries):
@@ -127,7 +125,6 @@ class APIClient:
                     continue
 
                 response.raise_for_status()
-                print(f"raise for status: {response.raise_for_status()}")
                 return response
 
             except requests.RequestException as e:
@@ -136,66 +133,6 @@ class APIClient:
                 wait_time = (2 ** attempt) + 1
                 time.sleep(wait_time)
 
-    # def _transform_response(self, service_name, data):
-    #     transformers = {
-    #         'openweather': self._transform_weather,
-    #         'newsapi': self._transform_news,
-    #         'github': self._transform_github,
-    #     }
-    #
-    #     transformer = transformers.get(service_name, lambda x: x)
-    #     return transformer(data)
-    #
-    # def _transform_weather(self, data):
-    #     return {
-    #         'service': 'openweather',
-    #         'location': data.get('name', 'Unknown'),
-    #         'country': data.get('sys', {}).get('country', ''),
-    #         'temperature': data.get('main', {}).get('temp'),
-    #         'feels_like': data.get('main', {}).get('feels_like'),
-    #         'description': data.get('weather', [{}])[0].get('description'),
-    #         'humidity': data.get('main', {}).get('humidity'),
-    #         'pressure': data.get('main', {}).get('pressure'),
-    #         'wind_speed': data.get('wind', {}).get('speed'),
-    #         'wind_direction': data.get('wind', {}).get('deg', 0),
-    #         'visibility': data.get('visibility', 0),
-    #         'timestamp': datetime.now().isoformat()
-    #     }
-    #
-    # def _transform_news(self, data):
-    #     return {
-    #         'service': 'newsapi',
-    #         'total_results': data.get('totalResults', 0),
-    #         'articles': [
-    #             {
-    #                 'title': article['title'],
-    #                 'description': article.get('description', ''),
-    #                 'url': article['url'],
-    #                 'image_url': article.get('urlToImage', ''),
-    #                 'source': article['source']['name'],
-    #                 'published_at': article['publishedAt'],
-    #                 'content': article.get('content', '')[:200] + '...' if article.get('content') else ''
-    #             }
-    #             for article in data.get('articles', [])[:8]  # Limit articles
-    #         ]
-    #     }
-    #
-    # def _transform_github(self, data):
-    #     return {
-    #         'service': 'github',
-    #         'username': data['login'],
-    #         'name': data.get('name', ''),
-    #         'avatar_url': data['avatar_url'],
-    #         'followers': data['followers'],
-    #         'following': data['following'],
-    #         'public_repos': data['public_repos'],
-    #         'public_gists': data['public_gists'],
-    #         'location': data.get('location', ''),
-    #         'company': data.get('company', ''),
-    #         'blog': data.get('blog', ''),
-    #         'created_at': data['created_at'],
-    #         'updated_at': data['updated_at']
-    #     }
 
     def _log_request(self, service_name, endpoint, status_code, response_time, user, cached=False):
         try:
